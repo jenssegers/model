@@ -1,5 +1,7 @@
 <?php namespace Jenssegers\Eloquentic;
 
+use \ArrayObject;
+
 abstract class Eloquentic extends ArrayObject {
 
     /**
@@ -22,7 +24,7 @@ abstract class Eloquentic extends ArrayObject {
      */
     static public function create($attributes = array())
     {
-        $model = static($attributes);
+        $model = new static($attributes);
 
         if (method_exists($model, 'save'))
         {
