@@ -4,6 +4,13 @@ use Illuminate\Support\ServiceProvider;
 
 class EloquenticServiceProvider extends ServiceProvider {
 
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = false;
+
 	/**
      * Bootstrap the application events.
      *
@@ -11,7 +18,16 @@ class EloquenticServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        $this->package('jenssegers/chef');
+        $this->package('jenssegers/eloquentic');
+    }
+
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
     }
 
     /**
