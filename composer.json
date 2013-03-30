@@ -1,0 +1,22 @@
+{
+    "name": "jenssegers/eloquentic",
+    "description": "Eloquent-ic-like model",
+    "keywords": ["laravel","eloquent","eloquentic","model"],
+    "authors": [
+        {
+            "name": "Jens Segers",
+            "email": "hello@jenssegers.be"
+        }
+    ],
+    "license" : "MIT",
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Jenssegers\\Eloquentic": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
