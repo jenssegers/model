@@ -17,6 +17,32 @@ abstract class Eloquentic extends ArrayObject {
     }
 
     /**
+     * Write all properties to internal array
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     */
+    public function __set($name, $value)
+    {
+        $this[$name] = $value;
+    }
+
+    /**
+     * Handle dynamic method calls into the method.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        // Create a query
+        $query = $this->newQuery();
+
+        return call_user_func_array(array($query, $method), $parameters);
+    }
+
+    /**
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
