@@ -12,8 +12,7 @@ abstract class Eloquentic extends ArrayObject {
      */
     public function __construct(array $attributes = array())
     {
-        // construct ArrayObject, object properties have precedence
-        parent::__construct($attributes, ArrayObject::STD_PROP_LIST);
+        parent::__construct($attributes);
     }
 
     /**
@@ -28,18 +27,14 @@ abstract class Eloquentic extends ArrayObject {
     }
 
     /**
-     * Handle dynamic method calls into the method.
+     * Get properties to internal array
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param  string  $name
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __get($name)
     {
-        // Create a query
-        $query = $this->newQuery();
-
-        return call_user_func_array(array($query, $method), $parameters);
+        return $this[$name];
     }
 
     /**
