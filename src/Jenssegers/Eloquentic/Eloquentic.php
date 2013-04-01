@@ -5,17 +5,6 @@ use \ArrayObject;
 abstract class Eloquentic extends ArrayObject {
 
     /**
-     * Create a new Eloquentic model instance.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    public function __construct(array $attributes = array())
-    {
-        parent::__construct($attributes);
-    }
-
-    /**
      * Write all properties to internal array
      *
      * @param  string $name
