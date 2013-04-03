@@ -1,7 +1,7 @@
 Eloquentic
 ==========
 
-Eloquentic provides an eloquent-like model base class that can be used to built custom models.
+Eloquentic provides an eloquent-like model base class that can be used to build custom models.
 
 Example:
 
@@ -38,4 +38,4 @@ Features
  - Accessors & Mutators
  - Boot method for bindings
 
-You can read more about Eloquent on four.laravel.com
+You can read more about Eloquent on http://four.laravel.com
