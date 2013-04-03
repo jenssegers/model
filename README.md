@@ -12,7 +12,7 @@ Example:
 
     	public function save() 
     	{
-    		return API::post('/items', (array) $this->attributes);
+    		return API::post('/items', $this->attributes);
     	}
 
     	public function getNameAttribute($value)
@@ -32,7 +32,7 @@ Example:
 Features
 --------
 
- - Automatic array and JSON conversion
+ - Automatic array and JSON conversion (castable)
  - Hiding attributes from Array or JSON conversion
  - Mass Assignment: fillable, guarded
  - Accessors & Mutators
