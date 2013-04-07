@@ -3,6 +3,7 @@
 use Closure;
 use ArrayAccess;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Database\Eloquent\MassAssignmentException;
 
 abstract class Eloquentic implements ArrayAccess {
 
@@ -82,13 +83,18 @@ abstract class Eloquentic implements ArrayAccess {
      * @param  array  $attributes
      * @return void
      */
-    public function __construct(array $attributes = array())
+    public function __construct($attributes = array())
     {
         if ( ! isset(static::$booted[get_class($this)]))
         {
             static::boot();
 
             static::$booted[get_class($this)] = true;
+        }
+
+        if (is_object($attributes))
+        {
+            $attributes = get_object_vars($attributes);
         }
 
         $this->fill($attributes);
