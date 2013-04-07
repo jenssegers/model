@@ -40,7 +40,7 @@ abstract class Eloquentic implements ArrayAccess {
      *
      * @var array
      */
-    protected $guarded = array('*');
+    protected $guarded = array();
 
     /**
      * Indicates whether attributes are snake cased on arrays.
