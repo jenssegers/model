@@ -748,7 +748,7 @@ abstract class Eloquentic implements ArrayAccess {
      */
     public function offsetGet($offset)
     {
-        return $this->$é;
+        return $this->$offset;
     }
 
     /**
