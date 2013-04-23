@@ -41,6 +41,13 @@ abstract class Eloquentic implements ArrayAccess {
      * @var array
      */
     protected $guarded = array();
+    
+    /**
+     * Indicates if the model exists.
+	 *
+	 * @var bool
+	 */
+	public $exists = false;
 
     /**
      * Indicates whether attributes are snake cased on arrays.
