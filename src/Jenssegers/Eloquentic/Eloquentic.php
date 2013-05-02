@@ -789,7 +789,7 @@ abstract class Eloquentic implements ArrayAccess {
      */
     public function __isset($key)
     {
-        return isset($this->attributes[$key]) or isset($this->relations[$key]);
+        return isset($this->attributes[$key]);
     }
 
     /**
@@ -801,22 +801,6 @@ abstract class Eloquentic implements ArrayAccess {
     public function __unset($key)
     {
         unset($this->attributes[$key]);
-
-        unset($this->relations[$key]);
-    }
-
-    /**
-     * Handle dynamic method calls into the method.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        $query = $this->newQuery();
-
-        return call_user_func_array(array($query, $method), $parameters);
     }
 
     /**
