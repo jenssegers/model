@@ -1,6 +1,6 @@
 {
     "name": "jenssegers/model",
-    "description": "Eloquent-ic-like model",
+    "description": "Eloquent-like model for Laravel",
     "keywords": ["laravel","eloquent","model"],
     "authors": [
         {
