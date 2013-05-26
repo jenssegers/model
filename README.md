@@ -67,3 +67,9 @@ Add the service provider in `app/config/app.php`:
 ```php
 'Jenssegers\Model\ModelServiceProvider',
 ```
+
+And add an alias:
+
+```php
+'Model'           => 'Jenssegers\Model\Model',
+```
