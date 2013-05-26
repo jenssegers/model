@@ -1,7 +1,7 @@
 Laravel Model [![Build Status](https://travis-ci.org/jenssegers/Laravel-Model.png?branch=master)](https://travis-ci.org/jenssegers/Laravel-Model)
 =============
 
-This model class provides an eloquent-like base class that can be used to build custom models.
+This model provides an eloquent-like base class that can be used to build custom models.
 
 Example:
 
