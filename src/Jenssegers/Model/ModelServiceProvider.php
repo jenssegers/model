@@ -1,8 +1,8 @@
-<?php namespace Jenssegers\Eloquentic;
+<?php namespace Jenssegers\Model;
 
 use Illuminate\Support\ServiceProvider;
 
-class EloquenticServiceProvider extends ServiceProvider {
+class ModelServiceProvider extends ServiceProvider {
 
     /**
      * Indicates if loading of the provider is deferred.
@@ -18,7 +18,7 @@ class EloquenticServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        $this->package('jenssegers/eloquentic');
+        $this->package('jenssegers/model');
     }
 
     /**
@@ -37,7 +37,7 @@ class EloquenticServiceProvider extends ServiceProvider {
      */
     public function provides()
     {
-        return array('Eloquentic');
+        return array('Model');
     }
 
 }

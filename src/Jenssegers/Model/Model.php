@@ -1,11 +1,10 @@
-<?php namespace Jenssegers\Eloquentic;
+<?php namespace Jenssegers\Model;
 
-use Closure;
 use ArrayAccess;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
-abstract class Eloquentic implements ArrayAccess {
+abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
 
     /**
      * The model's attributes.
@@ -15,13 +14,6 @@ abstract class Eloquentic implements ArrayAccess {
     protected $attributes = array();
 
     /**
-     * The model attribute's original state.
-     *
-     * @var array
-     */
-    protected $original = array();
-
-    /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
@@ -29,25 +21,11 @@ abstract class Eloquentic implements ArrayAccess {
     protected $hidden = array();
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that should be visible in arrays.
      *
-     * @var array
+     * @var arrays
      */
-    protected $fillable = array();
-
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
-    protected $guarded = array();
-    
-    /**
-     * Indicates if the model exists.
-	 *
-	 * @var bool
-	 */
-	public $exists = false;
+    protected $visible = array();
 
     /**
      * Indicates whether attributes are snake cased on arrays.
@@ -57,11 +35,11 @@ abstract class Eloquentic implements ArrayAccess {
     public static $snakeAttributes = true;
 
     /**
-     * The event dispatcher instance.
+     * Indicates if the model exists.
      *
-     * @var \Illuminate\Events\Dispatcher
+     * @var bool
      */
-    protected static $dispatcher;
+    public $exists = false;
 
     /**
      * The array of booted models.
@@ -69,13 +47,6 @@ abstract class Eloquentic implements ArrayAccess {
      * @var array
      */
     protected static $booted = array();
-
-    /**
-     * Indicates if all mass assignment is enabled.
-     *
-     * @var bool
-     */
-    protected static $unguarded = false;
 
     /**
      * The cache of the mutated attributes for each class.
@@ -90,18 +61,13 @@ abstract class Eloquentic implements ArrayAccess {
      * @param  array  $attributes
      * @return void
      */
-    public function __construct($attributes = array())
+    public function __construct(array $attributes = array())
     {
         if ( ! isset(static::$booted[get_class($this)]))
         {
             static::boot();
 
             static::$booted[get_class($this)] = true;
-        }
-
-        if (is_object($attributes))
-        {
-            $attributes = get_object_vars($attributes);
         }
 
         $this->fill($attributes);
@@ -142,17 +108,7 @@ abstract class Eloquentic implements ArrayAccess {
     {
         foreach ($attributes as $key => $value)
         {
-            // The developers may choose to place some attributes in the "fillable"
-            // array, which means only those attributes may be set through mass
-            // assignment to the model, and all others will just be ignored.
-            if ($this->isFillable($key))
-            {
-                $this->setAttribute($key, $value);
-            }
-            elseif ($this->totallyGuarded())
-            {
-                throw new MassAssignmentException($key);
-            }
+            $this->setAttribute($key, $value);
         }
 
         return $this;
@@ -162,157 +118,19 @@ abstract class Eloquentic implements ArrayAccess {
      * Create a new instance of the given model.
      *
      * @param  array  $attributes
+     * @param  bool   $exists
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function newInstance($attributes = array())
+    public function newInstance($attributes = array(), $exists = false)
     {
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
         $model = new static((array) $attributes);
 
+        $model->exists = $exists;
+
         return $model;
-    }
-
-    /**
-     * Save a new model and return the instance.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public static function create(array $attributes)
-    {
-        $model = new static($attributes);
-
-        if (method_exists($model, 'save')) $model->save();
-        
-        return $model;
-    }
-    
-    /**
-     * Register a saving model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function saving(Closure $callback)
-    {
-        static::registerModelEvent('saving', $callback);
-    }
-    
-    /**
-     * Register a saved model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function saved(Closure $callback)
-    {
-        static::registerModelEvent('saved', $callback);
-    }
-    
-    /**
-     * Register an updating model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function updating(Closure $callback)
-    {
-        static::registerModelEvent('updating', $callback);
-    }
-
-    /**
-     * Register an updated model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function updated(Closure $callback)
-    {
-        static::registerModelEvent('updated', $callback);
-    }
-
-    /**
-     * Register a creating model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function creating(Closure $callback)
-    {
-        static::registerModelEvent('creating', $callback);
-    }
-
-    /**
-     * Register a created model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function created(Closure $callback)
-    {
-        static::registerModelEvent('created', $callback);
-    }
-
-    /**
-     * Register a deleting model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function deleting(Closure $callback)
-    {
-        static::registerModelEvent('deleting', $callback);
-    }
-
-    /**
-     * Register a deleted model event with the dispatcher.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public static function deleted(Closure $callback)
-    {
-        static::registerModelEvent('deleted', $callback);
-    }
-
-    /**
-     * Register a model event with the dispatcher.
-     *
-     * @param  string   $event
-     * @param  Closure  $callback
-     * @return void
-     */
-    protected static function registerModelEvent($event, Closure $callback)
-    {
-        if (isset(static::$dispatcher))
-        {
-            $name = get_called_class();
-
-            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
-        }
-    }
-
-    /**
-     * Fire the given event for the model.
-     *
-     * @param  string $event
-     * @param  bool   $halt
-     * @return mixed
-     */
-    protected function fireModelEvent($event, $halt = true)
-    {
-        if ( ! isset(static::$dispatcher)) return true;
-
-        // We will append the names of the class to the event to distinguish it from
-        // other model events that are fired, allowing us to listen on each model
-        // event set individually instead of catching event for all the models.
-        $event = "eloquent.{$event}: ".get_class($this);
-
-        $method = $halt ? 'until' : 'fire';
-
-        return static::$dispatcher->$method($event, $this);
     }
 
     /**
@@ -337,101 +155,14 @@ abstract class Eloquentic implements ArrayAccess {
     }
 
     /**
-     * Get the fillable attributes for the model.
+     * Set the visible attributes for the model.
      *
-     * @return array
-     */
-    public function getFillable()
-    {
-        return $this->fillable;
-    }
-
-    /**
-     * Set the fillable attributes for the model.
-     *
-     * @param  array  $fillable
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function fillable(array $fillable)
-    {
-        $this->fillable = $fillable;
-
-        return $this;
-    }
-
-    /**
-     * Set the guarded attributes for the model.
-     *
-     * @param  array  $guarded
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function guard(array $guarded)
-    {
-        $this->guarded = $guarded;
-
-        return $this;
-    }
-
-    /**
-     * Disable all mass assignable restrictions.
-     *
+     * @param  array  $visible
      * @return void
      */
-    public static function unguard()
+    public function setVisible(array $visible)
     {
-        static::$unguarded = true;
-    }
-
-    /**
-     * Set "unguard" to a given state.
-     *
-     * @param  bool  $state
-     * @return void
-     */
-    public static function setUnguardState($state)
-    {
-        static::$unguarded = $state;
-    }
-
-    /**
-     * Determine if the given attribute may be mass assigned.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function isFillable($key)
-    {
-        if (static::$unguarded) return true;
-
-        // If the key is in the "fillable" array, we can of course assume tha it is
-        // a fillable attribute. Otherwise, we will check the guarded array when
-        // we need to determine if the attribute is black-listed on the model.
-        if (in_array($key, $this->fillable)) return true;
-
-        if ($this->isGuarded($key)) return false;
-
-        return empty($this->fillable) and ! starts_with($key, '_');
-    }
-
-    /**
-     * Determine if the given key is guarded.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function isGuarded($key)
-    {
-        return in_array($key, $this->guarded) or $this->guarded == array('*');
-    }
-
-    /**
-     * Determine if the model is totally guarded.
-     *
-     * @return bool
-     */
-    public function totallyGuarded()
-    {
-        return count($this->fillable) == 0 and $this->guarded == array('*');
+        $this->visible = $visible;
     }
 
     /**
@@ -464,7 +195,7 @@ abstract class Eloquentic implements ArrayAccess {
     {
         $attributes = $this->getAccessibleAttributes();
 
-        // We want to spin through all the mutated attribtues for this model and call
+        // We want to spin through all the mutated attributes for this model and call
         // the mutator for the attribute. We cache off every mutated attributes so
         // we don't have to constantly check on attributes that actually change.
         foreach ($this->getMutatedAttributes() as $key)
@@ -484,6 +215,11 @@ abstract class Eloquentic implements ArrayAccess {
      */
     protected function getAccessibleAttributes()
     {
+        if (count($this->visible) > 0)
+        {
+            return array_intersect_key($this->attributes, array_flip($this->visible));
+        }
+
         return array_diff_key($this->attributes, array_flip($this->hidden));
     }
 
@@ -598,6 +334,18 @@ abstract class Eloquentic implements ArrayAccess {
     }
 
     /**
+     * Clone the model into a new, non-existing instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function replicate()
+    {
+        with($instance = new static)->fill($this->attributes);
+
+        return $instance;
+    }
+
+    /**
      * Get all of the current attributes on the model.
      *
      * @return array
@@ -605,95 +353,6 @@ abstract class Eloquentic implements ArrayAccess {
     public function getAttributes()
     {
         return $this->attributes;
-    }
-
-    /**
-     * Set the array of model attributes. No checking is done.
-     *
-     * @param  array  $attributes
-     * @param  bool   $sync
-     * @return void
-     */
-    public function setRawAttributes(array $attributes, $sync = false)
-    {
-        $this->attributes = $attributes;
-
-        if ($sync) $this->syncOriginal();
-    }
-
-    /**
-     * Get the model's original attribute values.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return array
-     */
-    public function getOriginal($key = null, $default = null)
-    {
-        return array_get($this->original, $key, $default);
-    }
-
-    /**
-     * Sync the original attributes with the current.
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function syncOriginal()
-    {
-        $this->original = $this->attributes;
-
-        return $this;
-    }
-
-    /**
-     * Get the attributes that have been changed since last sync.
-     *
-     * @return array
-     */
-    public function getDirty()
-    {
-        $dirty = array();
-
-        foreach ($this->attributes as $key => $value)
-        {
-            if ( ! array_key_exists($key, $this->original) or $value != $this->original[$key])
-            {
-                $dirty[$key] = $value;
-            }
-        }
-
-        return $dirty;  
-    }
-
-    /**
-     * Get the event dispatcher instance.
-     *
-     * @return \Illuminate\Events\Dispatcher
-     */
-    public static function getEventDispatcher()
-    {
-        return static::$dispatcher;
-    }
-
-    /**
-     * Set the event dispatcher instance.
-     *
-     * @param  \Illuminate\Events\Dispatcher
-     * @return void
-     */
-    public static function setEventDispatcher(Dispatcher $dispatcher)
-    {
-        static::$dispatcher = $dispatcher;
-    }
-
-    /**
-     * Unset the event dispatcher for models.
-     *
-     * @return void
-     */
-    public static function unsetEventDispatcher()
-    {
-        static::$dispatcher = null;
     }
 
     /**
@@ -828,3 +487,5 @@ abstract class Eloquentic implements ArrayAccess {
     }
 
 }
+
+class MassAssignmentException extends \RuntimeException {}

@@ -1,41 +1,69 @@
-Eloquentic
-==========
+Laravel Model
+=============
 
-Eloquentic provides an eloquent-like model base class that can be used to build custom models.
+This model class provides an eloquent-like base class that can be used to build custom models.
 
 Example:
 
-    class MyModel extends Eloquentic {
+```php
+class User extends Model {
 
-    	protected $fillable = array('name');
-    	protected $hidden = array('secret');
+    protected $hidden = array('password');
 
-    	public function save() 
-    	{
-    		return API::post('/items', $this->attributes);
-    	}
-
-    	public function getNameAttribute($value)
-	    {
-	        return ucfirst($value);
-	    }
+    public function save() 
+    {
+        return API::post('/items', $this->attributes);
     }
 
-    $item = new MyModel(array('name' => 'hello'));
-    $item->secret = "world";
+    public function setBirthdayAttribute($value)
+    {
+        $this->attributes['birthday'] = strtotime($value);
+    }
 
-    $item->save();
+    public function getBirthdayAttribute($value)
+    {
+        return date('Y-m-d', $value);
+    }
 
-    // this will show a JSON object
-    echo $item;
+    public function getAgeAttribute($value)
+    {
+        $date = DateTime::createFromFormat('U', $this->attributes['birthday']);
+        return $date->diff(new DateTime('now'))->y;
+    }
+}
+
+$item = new User(array('name' => 'john'));
+$item->password = 'bar';
+
+echo $item; // {"name":"john"}
+``
 
 Features
 --------
 
- - Automatic array and JSON conversion (castable)
- - Hiding attributes from Array or JSON conversion
- - Mass Assignment: fillable, guarded
- - Accessors & Mutators
- - Boot method for bindings
+ - Array and JSON conversion
+ - Accessors and mutators
+ - Hidden attributes
 
-You can read more about Eloquent on http://four.laravel.com
+You can read more about these features and the original Eloquent model on http://four.laravel.com/docs/eloquent
+
+Installation
+------------
+
+Add the package to your `composer.json` or install manually.
+
+```yaml
+{
+    "require": {
+        "jenssegers/model": "*"
+    }
+}
+```
+
+Run `composer update` to download and install the package.
+
+Add the service provider in `app/config/app.php`:
+
+```php
+'Jenssegers\Model\ModelServiceProvider',
+```

@@ -1,7 +1,7 @@
 {
-    "name": "jenssegers/eloquentic",
+    "name": "jenssegers/model",
     "description": "Eloquent-ic-like model",
-    "keywords": ["laravel","eloquent","eloquentic","model"],
+    "keywords": ["laravel","eloquent","model"],
     "authors": [
         {
             "name": "Jens Segers",
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Jenssegers\\Eloquentic": "src/"
+            "Jenssegers\\Model": "src/"
         }
     },
     "minimum-stability": "dev"
