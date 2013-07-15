@@ -487,5 +487,3 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     }
 
 }
-
-class MassAssignmentException extends \RuntimeException {}
