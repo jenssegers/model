@@ -1,6 +1,6 @@
 {
     "name": "jenssegers/model",
-    "description": "Eloquent-like model for Laravel",
+    "description": "An eloquent-like model, for Laravel and other frameworks",
     "keywords": ["laravel","eloquent","model"],
     "authors": [
         {
@@ -11,7 +11,7 @@
     "license" : "MIT",
     "require": {
         "php": ">=5.3.0",
-        "illuminate/support": "4.0.x"
+        "illuminate/support": "4.1.x"
     },
     "autoload": {
         "psr-0": {

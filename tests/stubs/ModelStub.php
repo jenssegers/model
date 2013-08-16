@@ -32,4 +32,9 @@ class ModelStub extends Model {
         return $date->diff(new DateTime('now'))->y;
     }
 
+    public function getTestAttribute($value)
+    {
+        return 'test';
+    }
+
 }

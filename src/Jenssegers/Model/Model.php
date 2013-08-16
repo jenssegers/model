@@ -23,9 +23,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     /**
      * The attributes that should be visible in arrays.
      *
-     * @var arrays
+     * @var array
      */
     protected $visible = array();
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = array();
 
     /**
      * Indicates whether attributes are snake cased on arrays.
@@ -166,6 +173,17 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     }
 
     /**
+     * Set the accessors to append to model arrays.
+     *
+     * @param  array  $appends
+     * @return void
+     */
+    public function setAppends(array $appends)
+    {
+        $this->appends = $appends;
+    }
+
+    /**
      * Convert the model instance to JSON.
      *
      * @param  int  $options
@@ -193,7 +211,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
      */
     public function attributesToArray()
     {
-        $attributes = $this->getAccessibleAttributes();
+        $attributes = $this->getArrayableAttributes();
 
         // We want to spin through all the mutated attributes for this model and call
         // the mutator for the attribute. We cache off every mutated attributes so
@@ -202,25 +220,46 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
         {
             if ( ! array_key_exists($key, $attributes)) continue;
 
-            $attributes[$key] = $this->mutateAttribute($key, $attributes[$key]);
+            $attributes[$key] = $this->mutateAttribute(
+                $key, $attributes[$key]
+            );
+        }
+
+        // Here we will grab all of the appended, calculated attributes to this model
+        // as these attributes are not really in the attributes array, but are run
+        // when we need to array or JSON the model for convenience to the coder.
+        foreach ($this->appends as $key)
+        {
+            $attributes[$key] = $this->mutateAttribute($key, null);
         }
 
         return $attributes;
     }
 
     /**
-     * Get an attribute array of all accessible attributes.
+     * Get an attribute array of all arrayable attributes.
      *
      * @return array
      */
-    protected function getAccessibleAttributes()
+    protected function getArrayableAttributes()
+    {
+        return $this->getArrayableItems($this->attributes);
+    }
+
+    /**
+     * Get an attribute array of all arrayable values.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function getArrayableItems(array $values)
     {
         if (count($this->visible) > 0)
         {
-            return array_intersect_key($this->attributes, array_flip($this->visible));
+            return array_intersect_key($values, array_flip($this->visible));
         }
 
-        return array_diff_key($this->attributes, array_flip($this->hidden));
+        return array_diff_key($values, array_flip($this->hidden));  
     }
 
     /**

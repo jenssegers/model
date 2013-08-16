@@ -104,4 +104,17 @@ class ModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($model->name, $clone->name);
 	}
 
+	public function testAppends()
+	{
+		$model = new ModelStub;
+		$array = $model->toArray();
+		$this->assertFalse(isset($array['test']));
+
+		$model = new ModelStub;
+		$model->setAppends(array('test'));
+		$array = $model->toArray();
+		$this->assertTrue(isset($array['test']));
+		$this->assertEquals('test', $array['test']);
+	}
+
 }

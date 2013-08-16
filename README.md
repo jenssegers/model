@@ -1,7 +1,7 @@
 Laravel Model [![Build Status](https://travis-ci.org/jenssegers/Laravel-Model.png?branch=master)](https://travis-ci.org/jenssegers/Laravel-Model)
 =============
 
-This model provides an eloquent-like base class that can be used to build custom models.
+This model provides an eloquent-like base class that can be used to build custom models in Laravel 4 or other frameworks.
 
 Example:
 
@@ -39,16 +39,17 @@ Example:
 Features
 --------
 
- - Array and JSON conversion
  - Accessors and mutators
- - Hidden attributes
+ - Model to Array and JSON conversion
+ - Hidden attributes in Array/JSON conversion
+ - Appending accessors and mutators to Array/JSON conversion
 
 You can read more about these features and the original Eloquent model on http://four.laravel.com/docs/eloquent
 
 Installation
 ------------
 
-Add the package to your `composer.json` or install manually.
+Add the package to your `composer.json` and run `composer update`.
 
     {
         "require": {
@@ -56,12 +57,6 @@ Add the package to your `composer.json` or install manually.
         }
     }
 
-Run `composer update` to download and install the package.
-
-Add the service provider in `app/config/app.php`:
-
-    'Jenssegers\Model\ModelServiceProvider',
-
-And add an alias:
+And add an alias to the bottom of `app/config/app.php`:
 
     'Model'           => 'Jenssegers\Model\Model',
