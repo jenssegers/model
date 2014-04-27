@@ -70,14 +70,24 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
      */
     public function __construct(array $attributes = array())
     {
-        if ( ! isset(static::$booted[get_class($this)]))
-        {
-            static::boot();
-
-            static::$booted[get_class($this)] = true;
-        }
+        $this->bootIfNotBooted();
 
         $this->fill($attributes);
+    }
+
+    /**
+     * Check if the model needs to be booted and if so, do it.
+     *
+     * @return void
+     */
+    protected function bootIfNotBooted()
+    {
+        if ( ! isset(static::$booted[get_class($this)]))
+        {
+            static::$booted[get_class($this)] = true;
+
+            static::boot();
+        }
     }
 
     /**
@@ -259,7 +269,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
             return array_intersect_key($values, array_flip($this->visible));
         }
 
-        return array_diff_key($values, array_flip($this->hidden));  
+        return array_diff_key($values, array_flip($this->hidden));
     }
 
     /**
@@ -375,7 +385,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     /**
      * Clone the model into a new, non-existing instance.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Jenssegers\Model\Model
      */
     public function replicate()
     {
