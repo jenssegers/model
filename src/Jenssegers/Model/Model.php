@@ -119,7 +119,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Jenssegers\Model\Model
      */
     public function fill(array $attributes)
     {
@@ -136,7 +136,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
      *
      * @param  array  $attributes
      * @param  bool   $exists
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Jenssegers\Model\Model
      */
     public function newInstance($attributes = array(), $exists = false)
     {

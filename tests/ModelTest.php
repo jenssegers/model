@@ -9,10 +9,17 @@ class ModelTest extends PHPUnit_Framework_TestCase {
 	{
 		$model = new ModelStub;
 		$model->name = 'foo';
+
 		$this->assertEquals('foo', $model->name);
 		$this->assertTrue(isset($model->name));
 		unset($model->name);
+		$this->assertEquals(null, $model->name);
 		$this->assertFalse(isset($model->name));
+
+		$model['name'] = 'foo';
+		$this->assertTrue(isset($model['name']));
+		unset($model['name']);
+		$this->assertFalse(isset($model['name']));
 	}
 
 	public function testConstructor()
