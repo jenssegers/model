@@ -4,7 +4,7 @@ use Jenssegers\Model\Model;
 
 class ModelStub extends Model {
 
-	protected $hidden = array('secret');
+	protected $hidden = array('password');
 
 	public function getListItemsAttribute($value)
 	{
