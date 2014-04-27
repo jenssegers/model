@@ -5,7 +5,7 @@
     "authors": [
         {
             "name": "Jens Segers",
-            "email": "hello@jenssegers.be"
+            "homepage": "http://jenssegers.be"
         }
     ],
     "license" : "MIT",
@@ -17,6 +17,5 @@
         "psr-0": {
             "Jenssegers\\Model": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
