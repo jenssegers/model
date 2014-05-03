@@ -1,7 +1,7 @@
 Laravel Model 
 =============
 
-[![Build Status](https://travis-ci.org/jenssegers/Laravel-Model.png?branch=master)](https://travis-ci.org/jenssegers/Laravel-Model) [![Coverage Status](https://coveralls.io/repos/jenssegers/Laravel-Model/badge.png)](https://coveralls.io/r/jenssegers/Laravel-Model)
+[![Build Status](http://img.shields.io/travis/jenssegers/laravel-model.svg)](https://travis-ci.org/jenssegers/laravel-model) [![Coverage Status](http://img.shields.io/coveralls/jenssegers/laravel-model.svg)](https://coveralls.io/r/jenssegers/laravel-model)
 
 This model provides an eloquent-like base class that can be used to build custom models in Laravel 4 or other frameworks.
 
