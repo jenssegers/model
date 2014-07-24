@@ -83,7 +83,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     protected function bootIfNotBooted()
     {
         $class = get_class($this);
-        
+
         if ( ! isset(static::$booted[$class]))
         {
             static::$booted[$class] = true;
@@ -115,25 +115,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
                 static::$mutatorCache[$class][] = lcfirst($matches[1]);
             }
         }
-        
+
         static::bootTraits();
     }
-    
+
     /**
-	 * Boot all of the bootable traits on the model.
-	 *
-	 * @return void
-	 */
-	protected static function bootTraits()
-	{
-		foreach (class_uses_recursive(get_called_class()) as $trait)
-		{
-			if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
-			{
-				forward_static_call([get_called_class(), $method]);
-			}
-		}
-	}
+     * Boot all of the bootable traits on the model.
+     *
+     * @return void
+     */
+    protected static function bootTraits()
+    {
+        foreach (class_uses_recursive(get_called_class()) as $trait)
+        {
+            if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
+            {
+                forward_static_call([get_called_class(), $method]);
+            }
+        }
+    }
 
     /**
      * Fill the model with an array of attributes.
@@ -223,16 +223,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     {
         return json_encode($this->toArray(), $options);
     }
-    
+
     /**
-	 * Convert the object into something JSON serializable.
-	 *
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return $this->toArray();
-	}
+     * Convert the object into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
 
     /**
      * Convert the model instance to an array.
@@ -542,7 +542,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     public function __isset($key)
     {
         return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-				($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
+                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
     }
 
     /**
@@ -579,15 +579,15 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
     {
         return $this->toJson();
     }
-    
+
     /**
-	 * When a model is being unserialized, check if it needs to be booted.
-	 *
-	 * @return void
-	 */
-	public function __wakeup()
-	{
-		$this->bootIfNotBooted();
-	}
+     * When a model is being unserialized, check if it needs to be booted.
+     *
+     * @return void
+     */
+    public function __wakeup()
+    {
+        $this->bootIfNotBooted();
+    }
 
 }
