@@ -130,7 +130,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
         {
             if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
             {
-                forward_static_call([get_called_class(), $method]);
+                forward_static_call(array(get_called_class(), $method));
             }
         }
     }
