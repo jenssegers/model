@@ -116,7 +116,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
             }
         }
 
-        static::bootTraits();
+        if (function_exists('class_uses_recursive'))
+        {
+            static::bootTraits();
+        }
     }
 
     /**
