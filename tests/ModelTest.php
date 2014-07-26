@@ -70,6 +70,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(is_array($array));
 		$this->assertEquals('foo', $array['name']);
 		$this->assertFalse(isset($array['password']));
+		$this->assertEquals($array, $model->jsonSerialize());
 	}
 
 	public function testToJson()
@@ -144,6 +145,16 @@ class ModelTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($model->name, $model['name']);
 		$this->assertEquals($model->city, $model['city']);
+	}
+
+	public function testSerialize()
+	{
+		$model = new ModelStub;
+		$model->name = 'john';
+		$model->foo = 10;
+
+		$serialized = serialize($model);
+		$this->assertEquals($model, unserialize($serialized));
 	}
 
 }
