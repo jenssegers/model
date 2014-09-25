@@ -1,8 +1,8 @@
 <?php namespace Jenssegers\Model;
 
 use ArrayAccess;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Jsonable as JsonableInterface;
+use Illuminate\Contracts\Support\Arrayable as ArrayableInterface;
 
 abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
 
