@@ -1,9 +1,9 @@
-Laravel Model 
+Laravel Model
 =============
 
 [![Build Status](http://img.shields.io/travis/jenssegers/laravel-model.svg)](https://travis-ci.org/jenssegers/laravel-model) [![Coverage Status](http://img.shields.io/coveralls/jenssegers/laravel-model.svg)](https://coveralls.io/r/jenssegers/laravel-model)
 
-This model provides an eloquent-like base class that can be used to build custom models in Laravel 4 or other frameworks.
+This model provides an eloquent-like base class that can be used to build custom models in Laravel or other frameworks.
 
 Example:
 
@@ -11,7 +11,7 @@ Example:
 
         protected $hidden = array('password');
 
-        public function save() 
+        public function save()
         {
             return API::post('/items', $this->attributes);
         }
@@ -59,6 +59,6 @@ Add the package to your `composer.json` and run `composer update`.
         }
     }
 
-And add an alias to the bottom of `app/config/app.php`:
+Optaional: and add an alias to the bottom of `config/app.php`:
 
     'Model'           => 'Jenssegers\Model\Model',

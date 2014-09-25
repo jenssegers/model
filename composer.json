@@ -1,6 +1,6 @@
 {
     "name": "jenssegers/model",
-    "description": "An eloquent-like model, for Laravel 4 and other frameworks",
+    "description": "An eloquent-like model, for Laravel and other frameworks",
     "keywords": ["laravel","eloquent","model"],
     "authors": [
         {
