@@ -1,10 +1,11 @@
 <?php namespace Jenssegers\Model;
 
 use ArrayAccess;
-use Illuminate\Contracts\Support\Jsonable as JsonableInterface;
-use Illuminate\Contracts\Support\Arrayable as ArrayableInterface;
+use JsonSerializable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
-abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
+abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
 
     /**
      * The model's attributes.
