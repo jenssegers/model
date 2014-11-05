@@ -51,13 +51,9 @@ You can read more about these features and the original Eloquent model on http:/
 Installation
 ------------
 
-Add the package to your `composer.json` and run `composer update`.
+Install using composer:
 
-    {
-        "require": {
-            "jenssegers/model": "*"
-        }
-    }
+    composer require jenssegers/model
 
 Optaional: and add an alias to the bottom of `config/app.php`:
 
