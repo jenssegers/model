@@ -9,7 +9,9 @@ Example:
 
     class User extends Model {
 
-        protected $hidden = array('password');
+        protected $hidden = ['password'];
+
+        protected $casts ['age' => 'integer'];
 
         public function save()
         {
@@ -23,13 +25,12 @@ Example:
 
         public function getBirthdayAttribute($value)
         {
-            return date('Y-m-d', $value);
+            return new DateTime("@$value");
         }
 
         public function getAgeAttribute($value)
         {
-            $date = DateTime::createFromFormat('U', $this->attributes['birthday']);
-            return $date->diff(new DateTime('now'))->y;
+            return $this->birthday->diff(new DateTime('now'))->y;
         }
     }
 
@@ -45,8 +46,9 @@ Features
  - Model to Array and JSON conversion
  - Hidden attributes in Array/JSON conversion
  - Appending accessors and mutators to Array/JSON conversion
+ - Attribute casting
 
-You can read more about these features and the original Eloquent model on http://four.laravel.com/docs/eloquent
+You can read more about these features and the original Eloquent model on http://laravel.com/docs/eloquent
 
 Installation
 ------------
