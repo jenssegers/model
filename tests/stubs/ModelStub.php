@@ -4,7 +4,12 @@ use Jenssegers\Model\Model;
 
 class ModelStub extends Model {
 
-	protected $hidden = array('password');
+	protected $hidden = ['password'];
+
+    protected $casts = [
+        'age' => 'integer',
+        'score' => 'float'
+    ];
 
 	public function getListItemsAttribute($value)
 	{
@@ -29,6 +34,7 @@ class ModelStub extends Model {
     public function getAgeAttribute($value)
     {
     	$date = DateTime::createFromFormat('U', $this->attributes['birthday']);
+
         return $date->diff(new DateTime('now'))->y;
     }
 
