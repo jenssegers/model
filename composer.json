@@ -18,8 +18,8 @@
         "satooshi/php-coveralls": "*"
     },
     "autoload": {
-        "psr-0": {
-            "Jenssegers\\Model": "src/"
+        "psr-4": {
+            "Jenssegers\\Model\\": "src/"
         }
     }
 }
