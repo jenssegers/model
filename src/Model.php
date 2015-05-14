@@ -50,13 +50,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static $snakeAttributes = true;
 
     /**
-     * Indicates if the model exists.
-     *
-     * @var bool
-     */
-    public $exists = false;
-
-    /**
      * The array of booted models.
      *
      * @var array
@@ -107,23 +100,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected static function boot()
     {
-        $class = get_called_class();
-
-        static::$mutatorCache[$class] = array();
-
-        // Here we will extract all of the mutated attributes so that we can quickly
-        // spin through them after we export models to their array form, which we
-        // need to be fast. This will let us always know the attributes mutate.
-        foreach (get_class_methods($class) as $method)
-        {
-            if (preg_match('/^get(.+)Attribute$/', $method, $matches))
-            {
-                if (static::$snakeAttributes) $matches[1] = snake_case($matches[1]);
-
-                static::$mutatorCache[$class][] = lcfirst($matches[1]);
-            }
-        }
-
         if (function_exists('class_uses_recursive'))
         {
             static::bootTraits();
@@ -141,7 +117,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         {
             if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
             {
-                forward_static_call(array(get_called_class(), $method));
+                forward_static_call([get_called_class(), $method]);
             }
         }
     }
@@ -169,16 +145,29 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  bool   $exists
      * @return \Jenssegers\Model\Model
      */
-    public function newInstance($attributes = array(), $exists = false)
+    public function newInstance($attributes = array())
     {
-        // This method just provides a convenient way for us to generate fresh model
-        // instances of this current model. It is particularly useful during the
-        // hydration of new objects via the Eloquent query builder instances.
         $model = new static((array) $attributes);
 
-        $model->exists = $exists;
-
         return $model;
+    }
+
+    /**
+     * Create a collection of models from plain arrays.
+     *
+     * @param  array  $items
+     * @return array
+     */
+    public static function hydrate(array $items)
+    {
+        $instance = new static;
+
+        $items = array_map(function ($item) use ($instance)
+        {
+            return $instance->newInstance($item);
+        }, $items);
+
+        return $items;
     }
 
     /**
@@ -203,6 +192,29 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Add hidden attributes for the model.
+     *
+     * @param  array|string|null  $attributes
+     * @return void
+     */
+    public function addHidden($attributes = null)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        $this->hidden = array_merge($this->hidden, $attributes);
+    }
+
+    /**
+     * Get the visible attributes for the model.
+     *
+     * @return array
+     */
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
      * Set the visible attributes for the model.
      *
      * @param  array  $visible
@@ -211,6 +223,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function setVisible(array $visible)
     {
         $this->visible = $visible;
+    }
+
+    /**
+     * Add visible attributes for the model.
+     *
+     * @param  array|string|null  $attributes
+     * @return void
+     */
+    public function addVisible($attributes = null)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        $this->visible = array_merge($this->visible, $attributes);
     }
 
     /**
@@ -264,10 +289,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $attributes = $this->getArrayableAttributes();
 
+        $mutatedAttributes = $this->getMutatedAttributes();
+
         // We want to spin through all the mutated attributes for this model and call
         // the mutator for the attribute. We cache off every mutated attributes so
         // we don't have to constantly check on attributes that actually change.
-        foreach ($this->getMutatedAttributes() as $key)
+        foreach ($mutatedAttributes as $key)
         {
             if ( ! array_key_exists($key, $attributes)) continue;
 
@@ -460,9 +487,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->hasCast($key))
         {
-            $type = $this->getCastType($key);
-
-            return $type === 'array' || $type === 'json' || $type === 'object';
+            return in_array(
+                $this->getCastType($key), ['array', 'json', 'object'], true
+            );
         }
 
         return false;
@@ -488,6 +515,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function castAttribute($key, $value)
     {
+        if (is_null($value)) return $value;
+
         switch ($this->getCastType($key))
         {
             case 'int':
@@ -581,12 +610,39 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $class = get_class($this);
 
-        if (isset(static::$mutatorCache[$class]))
+        if ( ! isset(static::$mutatorCache[$class]))
         {
-            return static::$mutatorCache[get_class($this)];
+            static::cacheMutatedAttributes($class);
         }
 
-        return array();
+        return static::$mutatorCache[$class];
+    }
+
+    /**
+     * Extract and cache all the mutated attributes of a class.
+     *
+     * @param string $class
+     * @return void
+     */
+    public static function cacheMutatedAttributes($class)
+    {
+        $mutatedAttributes = array();
+
+        // Here we will extract all of the mutated attributes so that we can quickly
+        // spin through them after we export models to their array form, which we
+        // need to be fast. This'll let us know the attributes that can mutate.
+        foreach (get_class_methods($class) as $method)
+        {
+            if (strpos($method, 'Attribute') !== false &&
+                        preg_match('/^get(.+)Attribute$/', $method, $matches))
+            {
+                if (static::$snakeAttributes) $matches[1] = snake_case($matches[1]);
+
+                $mutatedAttributes[] = lcfirst($matches[1]);
+            }
+        }
+
+        static::$mutatorCache[$class] = $mutatedAttributes;
     }
 
     /**

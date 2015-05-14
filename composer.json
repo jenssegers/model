@@ -21,5 +21,8 @@
         "psr-4": {
             "Jenssegers\\Model\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "classmap": ["tests/stubs"]
     }
 }

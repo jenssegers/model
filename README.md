@@ -7,37 +7,39 @@ This model provides an eloquent-like base class that can be used to build custom
 
 Example:
 
-    class User extends Model {
+```php
+class User extends Model {
 
-        protected $hidden = ['password'];
+    protected $hidden = ['password'];
 
-        protected $casts ['age' => 'integer'];
+    protected $casts ['age' => 'integer'];
 
-        public function save()
-        {
-            return API::post('/items', $this->attributes);
-        }
-
-        public function setBirthdayAttribute($value)
-        {
-            $this->attributes['birthday'] = strtotime($value);
-        }
-
-        public function getBirthdayAttribute($value)
-        {
-            return new DateTime("@$value");
-        }
-
-        public function getAgeAttribute($value)
-        {
-            return $this->birthday->diff(new DateTime('now'))->y;
-        }
+    public function save()
+    {
+        return API::post('/items', $this->attributes);
     }
 
-    $item = new User(array('name' => 'john'));
-    $item->password = 'bar';
+    public function setBirthdayAttribute($value)
+    {
+        $this->attributes['birthday'] = strtotime($value);
+    }
 
-    echo $item; // {"name":"john"}
+    public function getBirthdayAttribute($value)
+    {
+        return new DateTime("@$value");
+    }
+
+    public function getAgeAttribute($value)
+    {
+        return $this->birthday->diff(new DateTime('now'))->y;
+    }
+}
+
+$item = new User(array('name' => 'john'));
+$item->password = 'bar';
+
+echo $item; // {"name":"john"}
+```
 
 Features
 --------
@@ -55,8 +57,12 @@ Installation
 
 Install using composer:
 
-    composer require jenssegers/model
+```
+composer require jenssegers/model
+``
 
 Optaional: and add an alias to the bottom of `config/app.php`:
 
-    'Model'           => 'Jenssegers\Model\Model',
+```php
+'Model'           => 'Jenssegers\Model\Model',
+```

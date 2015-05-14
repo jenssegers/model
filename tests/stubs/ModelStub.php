@@ -4,24 +4,28 @@ use Jenssegers\Model\Model;
 
 class ModelStub extends Model {
 
-	protected $hidden = ['password'];
+    use TraitStub;
+
+    protected $hidden = ['password'];
 
     protected $casts = [
-        'age' => 'integer',
-        'score' => 'float'
+        'age'   => 'integer',
+        'score' => 'float',
+        'data'  => 'array',
+        'active' => 'bool'
     ];
 
-	public function getListItemsAttribute($value)
-	{
-		return json_decode($value, true);
-	}
+    public function getListItemsAttribute($value)
+    {
+        return json_decode($value, true);
+    }
 
-	public function setListItemsAttribute($value)
-	{
-		$this->attributes['list_items'] = json_encode($value);
-	}
+    public function setListItemsAttribute($value)
+    {
+        $this->attributes['list_items'] = json_encode($value);
+    }
 
-	public function setBirthdayAttribute($value)
+    public function setBirthdayAttribute($value)
     {
         $this->attributes['birthday'] = strtotime($value);
     }
@@ -33,7 +37,7 @@ class ModelStub extends Model {
 
     public function getAgeAttribute($value)
     {
-    	$date = DateTime::createFromFormat('U', $this->attributes['birthday']);
+        $date = DateTime::createFromFormat('U', $this->attributes['birthday']);
 
         return $date->diff(new DateTime('now'))->y;
     }
