@@ -2,13 +2,14 @@
     "name": "jenssegers/model",
     "description": "An eloquent-like model, for Laravel and other frameworks",
     "keywords": ["laravel","eloquent","model"],
+    "homepage": "https://github.com/jenssegers/laravel-model",
+    "license" : "MIT",
     "authors": [
         {
             "name": "Jens Segers",
-            "homepage": "http://jenssegers.be"
+            "homepage": "https://jenssegers.com"
         }
     ],
-    "license" : "MIT",
     "require": {
         "php": ">=5.4.0",
         "illuminate/support": "*",
