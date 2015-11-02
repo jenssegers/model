@@ -2,11 +2,11 @@
 
 trait TraitStub {
 
-	public static $traitIsBooted = false;
+    public static $traitIsBooted = false;
 
-	public static function bootTraitStub()
-	{
-		self::$traitIsBooted = true;
-	}
+    public static function bootTraitStub()
+    {
+        self::$traitIsBooted = true;
+    }
 
 }
