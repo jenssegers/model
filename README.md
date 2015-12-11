@@ -12,6 +12,8 @@ class User extends Model {
 
     protected $hidden = ['password'];
 
+    protected $guarded = ['password'];
+
     protected $casts ['age' => 'integer'];
 
     public function save()
@@ -47,6 +49,7 @@ Features
  - Accessors and mutators
  - Model to Array and JSON conversion
  - Hidden attributes in Array/JSON conversion
+ - Guarded and fillable attributes
  - Appending accessors and mutators to Array/JSON conversion
  - Attribute casting
 

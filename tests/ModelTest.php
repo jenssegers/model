@@ -195,6 +195,16 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         ModelStub::reguard();
     }
 
+    public function testTotallyGuarded()
+    {
+        $this->setExpectedException('Jenssegers\Model\MassAssignmentException');
+
+        $model = new ModelStub();
+        $model->guard(['*']);
+        $model->fillable([]);
+        $model->fill(['name' => 'John Doe']);
+    }
+
     public function testFillable()
     {
         $model = new ModelStub(['foo' => 'bar']);
