@@ -21,14 +21,14 @@ class ModelTest extends PHPUnit_Framework_TestCase {
 
     public function testConstructor()
     {
-        $model = new ModelStub(array('name' => 'john'));
+        $model = new ModelStub(['name' => 'john']);
         $this->assertEquals('john', $model->name);
     }
 
     public function testNewInstanceWithAttributes()
     {
         $model = new ModelStub;
-        $instance = $model->newInstance(array('name' => 'john'));
+        $instance = $model->newInstance(['name' => 'john']);
 
         $this->assertInstanceOf('ModelStub', $instance);
         $this->assertEquals('john', $instance->name);
@@ -41,18 +41,18 @@ class ModelTest extends PHPUnit_Framework_TestCase {
 
         $attributes = $model->attributesToArray();
         $this->assertFalse(isset($attributes['password']));
-        $this->assertEquals(array('password'), $model->getHidden());
+        $this->assertEquals(['password'], $model->getHidden());
     }
 
     public function testVisible()
     {
         $model = new ModelStub;
-        $model->setVisible(array('name'));
+        $model->setVisible(['name']);
         $model->name = 'John Doe';
         $model->city = 'Paris';
 
         $attributes = $model->attributesToArray();
-        $this->assertEquals(array('name' => 'John Doe'), $attributes);
+        $this->assertEquals(['name' => 'John Doe'], $attributes);
     }
 
     public function testToArray()
@@ -61,7 +61,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $model->name = 'foo';
         $model->bar = null;
         $model->password = 'password1';
-        $model->setHidden(array('password'));
+        $model->setHidden(['password']);
         $array = $model->toArray();
 
         $this->assertTrue(is_array($array));
@@ -87,10 +87,10 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     public function testMutator()
     {
         $model = new ModelStub;
-        $model->list_items = array('name' => 'john');
-        $this->assertEquals(array('name' => 'john'), $model->list_items);
+        $model->list_items = ['name' => 'john'];
+        $this->assertEquals(['name' => 'john'], $model->list_items);
         $attributes = $model->getAttributes();
-        $this->assertEquals(json_encode(array('name' => 'john')), $attributes['list_items']);
+        $this->assertEquals(json_encode(['name' => 'john']), $attributes['list_items']);
 
         $birthday = strtotime('245 months ago');
 
@@ -104,10 +104,10 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     public function testToArrayUsesMutators()
     {
         $model = new ModelStub;
-        $model->list_items = array(1, 2, 3);
+        $model->list_items = [1, 2, 3];
         $array = $model->toArray();
 
-        $this->assertEquals(array(1, 2, 3), $array['list_items']);
+        $this->assertEquals([1, 2, 3], $array['list_items']);
     }
 
     public function testReplicate()
@@ -128,7 +128,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse(isset($array['test']));
 
         $model = new ModelStub;
-        $model->setAppends(array('test'));
+        $model->setAppends(['test']);
         $array = $model->toArray();
         $this->assertTrue(isset($array['test']));
         $this->assertEquals('test', $array['test']);
@@ -176,10 +176,28 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(is_bool($array['active']));
     }
 
-    public function testBootsTrait()
+    public function testGuarded()
     {
-        $model = new ModelStub;
-        $this->assertTrue(ModelStub::$traitIsBooted);
+        $model = new ModelStub(['secret' => 'foo']);
+        $this->assertTrue($model->isGuarded('secret'));
+        $this->assertNull($model->secret);
+
+        $model->secret = 'bar';
+        $this->assertEquals('bar', $model->secret);
+
+        ModelStub::unguard();
+
+        $model = new ModelStub(['secret' => 'foo']);
+        $this->assertEquals('foo', $model->secret);
+
+        ModelStub::reguard();
+    }
+
+    public function testFillable()
+    {
+        $model = new ModelStub(['foo' => 'bar']);
+        $this->assertFalse($model->isFillable('foo'));
+        $this->assertNull($model->foo);
     }
 
 }

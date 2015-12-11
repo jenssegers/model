@@ -1,9 +1,11 @@
 <?php namespace Jenssegers\Model;
 
 use ArrayAccess;
-use JsonSerializable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use JsonSerializable;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
 
@@ -12,35 +14,49 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @var array
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
-    protected $hidden = array();
+    protected $hidden = [];
 
     /**
      * The attributes that should be visible in arrays.
      *
      * @var array
      */
-    protected $visible = array();
+    protected $visible = [];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
-    protected $appends = array();
+    protected $appends = [];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [];
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
 
     /**
      * The attributes that should be casted to native types.
      *
      * @var array
      */
-    protected $casts = array();
+    protected $casts = [];
 
     /**
      * Indicates whether attributes are snake cased on arrays.
@@ -50,18 +66,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static $snakeAttributes = true;
 
     /**
-     * The array of booted models.
+     * Indicates if all mass assignment is enabled.
      *
-     * @var array
+     * @var bool
      */
-    protected static $booted = array();
+    protected static $unguarded = false;
 
     /**
      * The cache of the mutated attributes for each class.
      *
      * @var array
      */
-    protected static $mutatorCache = array();
+    protected static $mutatorCache = [];
 
     /**
      * Create a new Eloquent model instance.
@@ -69,73 +85,74 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $attributes
      * @return void
      */
-    public function __construct(array $attributes = array())
+    public function __construct(array $attributes = [])
     {
-        $this->bootIfNotBooted();
-
         $this->fill($attributes);
-    }
-
-    /**
-     * Check if the model needs to be booted and if so, do it.
-     *
-     * @return void
-     */
-    protected function bootIfNotBooted()
-    {
-        $class = get_class($this);
-
-        if ( ! isset(static::$booted[$class]))
-        {
-            static::$booted[$class] = true;
-
-            static::boot();
-        }
-    }
-
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        if (function_exists('class_uses_recursive'))
-        {
-            static::bootTraits();
-        }
-    }
-
-    /**
-     * Boot all of the bootable traits on the model.
-     *
-     * @return void
-     */
-    protected static function bootTraits()
-    {
-        foreach (class_uses_recursive(get_called_class()) as $trait)
-        {
-            if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait)))
-            {
-                forward_static_call([get_called_class(), $method]);
-            }
-        }
     }
 
     /**
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
-     * @return \Jenssegers\Model\Model
+     * @return $this
+     *
+     * @throws \Jenssegers\Model\MassAssignmentException
      */
     public function fill(array $attributes)
     {
-        foreach ($attributes as $key => $value)
+        $totallyGuarded = $this->totallyGuarded();
+
+        foreach ($this->fillableFromArray($attributes) as $key => $value)
         {
-            $this->setAttribute($key, $value);
+            // The developers may choose to place some attributes in the "fillable"
+            // array, which means only those attributes may be set through mass
+            // assignment to the model, and all others will just be ignored.
+            if ($this->isFillable($key))
+            {
+                $this->setAttribute($key, $value);
+            }
+            elseif ($totallyGuarded)
+            {
+                throw new MassAssignmentException($key);
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * Fill the model with an array of attributes. Force mass assignment.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function forceFill(array $attributes)
+    {
+        // Since some versions of PHP have a bug that prevents it from properly
+        // binding the late static context in a closure, we will first store
+        // the model in a variable, which we will then use in the closure.
+        $model = $this;
+
+        return static::unguarded(function () use ($model, $attributes)
+        {
+            return $model->fill($attributes);
+        });
+    }
+
+    /**
+     * Get the fillable attributes of a given array.
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function fillableFromArray(array $attributes)
+    {
+        if (count($this->fillable) > 0 && ! static::$unguarded)
+        {
+            return array_intersect_key($attributes, array_flip($this->fillable));
+        }
+
+        return $attributes;
     }
 
     /**
@@ -145,7 +162,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  bool   $exists
      * @return \Jenssegers\Model\Model
      */
-    public function newInstance($attributes = array())
+    public function newInstance($attributes = [])
     {
         $model = new static((array) $attributes);
 
@@ -184,11 +201,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the hidden attributes for the model.
      *
      * @param  array  $hidden
-     * @return void
+     * @return $this
      */
     public function setHidden(array $hidden)
     {
         $this->hidden = $hidden;
+
+        return $this;
     }
 
     /**
@@ -205,6 +224,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Make the given, typically hidden, attributes visible.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function withHidden($attributes)
+    {
+        $this->hidden = array_diff($this->hidden, (array) $attributes);
+
+        return $this;
+    }
+
+    /**
      * Get the visible attributes for the model.
      *
      * @return array
@@ -218,11 +250,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the visible attributes for the model.
      *
      * @param  array  $visible
-     * @return void
+     * @return $this
      */
     public function setVisible(array $visible)
     {
         $this->visible = $visible;
+
+        return $this;
     }
 
     /**
@@ -242,11 +276,162 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set the accessors to append to model arrays.
      *
      * @param  array  $appends
-     * @return void
+     * @return $this
      */
     public function setAppends(array $appends)
     {
         $this->appends = $appends;
+
+        return $this;
+    }
+
+    /**
+     * Get the fillable attributes for the model.
+     *
+     * @return array
+     */
+    public function getFillable()
+    {
+        return $this->fillable;
+    }
+
+    /**
+     * Set the fillable attributes for the model.
+     *
+     * @param  array  $fillable
+     * @return $this
+     */
+    public function fillable(array $fillable)
+    {
+        $this->fillable = $fillable;
+
+        return $this;
+    }
+
+    /**
+     * Get the guarded attributes for the model.
+     *
+     * @return array
+     */
+    public function getGuarded()
+    {
+        return $this->guarded;
+    }
+
+    /**
+     * Set the guarded attributes for the model.
+     *
+     * @param  array  $guarded
+     * @return $this
+     */
+    public function guard(array $guarded)
+    {
+        $this->guarded = $guarded;
+
+        return $this;
+    }
+
+    /**
+     * Disable all mass assignable restrictions.
+     *
+     * @param  bool  $state
+     * @return void
+     */
+    public static function unguard($state = true)
+    {
+        static::$unguarded = $state;
+    }
+
+    /**
+     * Enable the mass assignment restrictions.
+     *
+     * @return void
+     */
+    public static function reguard()
+    {
+        static::$unguarded = false;
+    }
+
+    /**
+     * Determine if current state is "unguarded".
+     *
+     * @return bool
+     */
+    public static function isUnguarded()
+    {
+        return static::$unguarded;
+    }
+
+    /**
+     * Run the given callable while being unguarded.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function unguarded(callable $callback)
+    {
+        if (static::$unguarded)
+        {
+            return $callback();
+        }
+
+        static::unguard();
+
+        $result = $callback();
+
+        static::reguard();
+
+        return $result;
+    }
+
+    /**
+     * Determine if the given attribute may be mass assigned.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function isFillable($key)
+    {
+        if (static::$unguarded)
+        {
+            return true;
+        }
+
+        // If the key is in the "fillable" array, we can of course assume that it's
+        // a fillable attribute. Otherwise, we will check the guarded array when
+        // we need to determine if the attribute is black-listed on the model.
+        if (in_array($key, $this->fillable))
+        {
+            return true;
+        }
+
+        if ($this->isGuarded($key))
+        {
+            return false;
+        }
+
+        return empty($this->fillable) && ! Str::startsWith($key, '_');
+    }
+
+    /**
+     * Determine if the given key is guarded.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function isGuarded($key)
+    {
+        return in_array($key, $this->guarded) || $this->guarded == ['*'];
+    }
+
+    /**
+     * Determine if the model is totally guarded.
+     *
+     * @return bool
+     */
+    public function totallyGuarded()
+    {
+        return count($this->fillable) == 0 && $this->guarded == ['*'];
     }
 
     /**
@@ -257,7 +442,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**
@@ -359,12 +544,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getArrayableItems(array $values)
     {
-        if (count($this->visible) > 0)
+        if (count($this->getVisible()) > 0)
         {
-            return array_intersect_key($values, array_flip($this->visible));
+            return array_intersect_key($values, array_flip($this->getVisible()));
         }
 
-        return array_diff_key($values, array_flip($this->hidden));
+        return array_diff_key($values, array_flip($this->getHidden()));
     }
 
     /**
@@ -375,15 +560,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getAttribute($key)
     {
-        $inAttributes = array_key_exists($key, $this->attributes);
-
-        // If the key references an attribute, we can just go ahead and return the
-        // plain attribute value from the model. This allows every attribute to
-        // be dynamically accessed through the _get method without accessors.
-        if ($inAttributes or $this->hasGetMutator($key))
-        {
-            return $this->getAttributeValue($key);
-        }
+        return $this->getAttributeValue($key);
     }
 
     /**
@@ -437,7 +614,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.studly_case($key).'Attribute');
+        return method_exists($this, 'get'.Str::studly($key).'Attribute');
     }
 
     /**
@@ -449,7 +626,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.studly_case($key).'Attribute'}($value);
+        return $this->{'get'.Str::studly($key).'Attribute'}($value);
     }
 
     /**
@@ -463,7 +640,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $value = $this->mutateAttribute($key, $value);
 
-        return $value instanceof ArrayableInterface ? $value->toArray() : $value;
+        return $value instanceof Arrayable ? $value->toArray() : $value;
     }
 
     /**
@@ -485,14 +662,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isJsonCastable($key)
     {
-        if ($this->hasCast($key))
-        {
-            return in_array(
-                $this->getCastType($key), ['array', 'json', 'object'], true
-            );
-        }
-
-        return false;
+        return $this->hasCast($key) &&
+               in_array($this->getCastType($key), ['array', 'json', 'object'], true);
     }
 
     /**
@@ -532,10 +703,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'boolean':
                 return (bool) $value;
             case 'object':
-                return json_decode($value);
+                return $this->fromJson($value, true);
             case 'array':
             case 'json':
-                return json_decode($value, true);
+                return $this->fromJson($value);
             default:
                 return $value;
         }
@@ -545,8 +716,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Set a given attribute on the model.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param  mixed  $value
+     * @return $this
      */
     public function setAttribute($key, $value)
     {
@@ -555,17 +726,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key))
         {
-            $method = 'set'.studly_case($key).'Attribute';
+            $method = 'set'.Str::studly($key).'Attribute';
 
             return $this->{$method}($value);
         }
 
-        if ($this->isJsonCastable($key))
+        if ($this->isJsonCastable($key) && ! is_null($value))
         {
-            $value = json_encode($value);
+            $value = $this->asJson($value);
         }
 
         $this->attributes[$key] = $value;
+
+        return $this;
     }
 
     /**
@@ -576,19 +749,45 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.studly_case($key).'Attribute');
+        return method_exists($this, 'set'.Str::studly($key).'Attribute');
+    }
+
+    /**
+     * Encode the given value as JSON.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asJson($value)
+    {
+        return json_encode($value);
+    }
+
+    /**
+     * Decode the given JSON back into an array or object.
+     *
+     * @param  string  $value
+     * @param  bool  $asObject
+     * @return mixed
+     */
+    public function fromJson($value, $asObject = false)
+    {
+        return json_decode($value, ! $asObject);
     }
 
     /**
      * Clone the model into a new, non-existing instance.
      *
+     * @param  array|null  $except
      * @return \Jenssegers\Model\Model
      */
-    public function replicate()
+    public function replicate(array $except = null)
     {
-        with($instance = new static)->fill($this->attributes);
+        $except = $except ?: [];
 
-        return $instance;
+        $attributes = Arr::except($this->attributes, $except);
+
+        return with($instance = new static)->fill($attributes);
     }
 
     /**
@@ -626,19 +825,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function cacheMutatedAttributes($class)
     {
-        $mutatedAttributes = array();
+        $mutatedAttributes = [];
 
         // Here we will extract all of the mutated attributes so that we can quickly
         // spin through them after we export models to their array form, which we
         // need to be fast. This'll let us know the attributes that can mutate.
-        foreach (get_class_methods($class) as $method)
+        if (preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches))
         {
-            if (strpos($method, 'Attribute') !== false &&
-                        preg_match('/^get(.+)Attribute$/', $method, $matches))
+            foreach ($matches[1] as $match)
             {
-                if (static::$snakeAttributes) $matches[1] = snake_case($matches[1]);
+                if (static::$snakeAttributes)
+                {
+                    $match = Str::snake($match);
+                }
 
-                $mutatedAttributes[] = lcfirst($matches[1]);
+                $mutatedAttributes[] = lcfirst($match);
             }
         }
 
@@ -660,7 +861,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Dynamically set attributes on the model.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)
@@ -717,12 +918,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Determine if an attribute exists on the model.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     public function __isset($key)
     {
-        return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
+        return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
+                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key)));
     }
 
     /**
@@ -747,7 +948,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $instance = new static;
 
-        return call_user_func_array(array($instance, $method), $parameters);
+        return call_user_func_array([$instance, $method], $parameters);
     }
 
     /**
@@ -758,16 +959,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __toString()
     {
         return $this->toJson();
-    }
-
-    /**
-     * When a model is being unserialized, check if it needs to be booted.
-     *
-     * @return void
-     */
-    public function __wakeup()
-    {
-        $this->bootIfNotBooted();
     }
 
 }

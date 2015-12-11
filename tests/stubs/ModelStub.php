@@ -4,15 +4,27 @@ use Jenssegers\Model\Model;
 
 class ModelStub extends Model {
 
-    use TraitStub;
-
     protected $hidden = ['password'];
 
     protected $casts = [
         'age'   => 'integer',
         'score' => 'float',
         'data'  => 'array',
-        'active' => 'bool'
+        'active' => 'bool',
+        'secret' => 'string',
+    ];
+
+    protected $guarded = [
+        'secret',
+    ];
+
+    protected $fillable = [
+        'name',
+        'city',
+        'age',
+        'score',
+        'data',
+        'active',
     ];
 
     public function getListItemsAttribute($value)
