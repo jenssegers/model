@@ -5,7 +5,29 @@ Model
 
 This model provides an Laravel eloquent-like base class that can be used to build custom models in Laravel or other frameworks.
 
-Example:
+Features
+--------
+
+ - Accessors and mutators
+ - Model to Array and JSON conversion
+ - Hidden attributes in Array/JSON conversion
+ - Guarded and fillable attributes
+ - Appending accessors and mutators to Array/JSON conversion
+ - Attribute casting
+
+You can read more about these features and the original Eloquent model on http://laravel.com/docs/eloquent
+
+Installation
+------------
+
+Install using composer:
+
+```
+composer require jenssegers/model
+```
+
+Example
+-------
 
 ```php
 class User extends Model {
@@ -41,31 +63,4 @@ $item = new User(array('name' => 'john'));
 $item->password = 'bar';
 
 echo $item; // {"name":"john"}
-```
-
-Features
---------
-
- - Accessors and mutators
- - Model to Array and JSON conversion
- - Hidden attributes in Array/JSON conversion
- - Guarded and fillable attributes
- - Appending accessors and mutators to Array/JSON conversion
- - Attribute casting
-
-You can read more about these features and the original Eloquent model on http://laravel.com/docs/eloquent
-
-Installation
-------------
-
-Install using composer:
-
-```
-composer require jenssegers/model
-``
-
-Optaional: and add an alias to the bottom of `config/app.php`:
-
-```php
-'Model'           => 'Jenssegers\Model\Model',
 ```
