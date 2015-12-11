@@ -1,9 +1,9 @@
-Laravel Model
-=============
+Model
+=====
 
-[![Build Status](http://img.shields.io/travis/jenssegers/laravel-model.svg)](https://travis-ci.org/jenssegers/laravel-model) [![Coverage Status](http://img.shields.io/coveralls/jenssegers/laravel-model.svg)](https://coveralls.io/r/jenssegers/laravel-model)
+[![Build Status](http://img.shields.io/travis/jenssegers/model.svg)](https://travis-ci.org/jenssegers/model) [![Coverage Status](http://img.shields.io/coveralls/jenssegers/model.svg)](https://coveralls.io/r/jenssegers/model)
 
-This model provides an eloquent-like base class that can be used to build custom models in Laravel or other frameworks.
+This model provides an Laravel eloquent-like base class that can be used to build custom models in Laravel or other frameworks.
 
 Example:
 
