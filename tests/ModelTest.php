@@ -181,12 +181,14 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $model = new ModelStub(['secret' => 'foo']);
         $this->assertTrue($model->isGuarded('secret'));
         $this->assertNull($model->secret);
+        $this->assertContains('secret', $model->getGuarded());
 
         $model->secret = 'bar';
         $this->assertEquals('bar', $model->secret);
 
         ModelStub::unguard();
 
+        $this->assertTrue(ModelStub::isUnguarded());
         $model = new ModelStub(['secret' => 'foo']);
         $this->assertEquals('foo', $model->secret);
 
@@ -198,6 +200,20 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $model = new ModelStub(['foo' => 'bar']);
         $this->assertFalse($model->isFillable('foo'));
         $this->assertNull($model->foo);
+        $this->assertNotContains('foo', $model->getFillable());
+
+        $model->foo = 'bar';
+        $this->assertEquals('bar', $model->foo);
+
+        $model = new ModelStub;
+        $model->forceFill(['foo' => 'bar']);
+        $this->assertEquals('bar', $model->foo);
+    }
+
+    public function testHydrate()
+    {
+        $models = ModelStub::hydrate([['name' => 'John Doe']]);
+        $this->assertEquals('John Doe', $models[0]->name);
     }
 
 }
