@@ -410,7 +410,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return false;
         }
 
-        return empty($this->fillable) && ! Str::startsWith($key, '_');
+        return empty($this->fillable);
     }
 
     /**
