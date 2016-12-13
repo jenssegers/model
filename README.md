@@ -36,7 +36,7 @@ class User extends Model {
 
     protected $guarded = ['password'];
 
-    protected $casts ['age' => 'integer'];
+    protected $casts = ['age' => 'integer'];
 
     public function save()
     {
