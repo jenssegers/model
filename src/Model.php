@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection as BaseCollection;
 use JsonSerializable;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable {
@@ -681,15 +682,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Cast an attribute to a native PHP type.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return mixed
      */
     protected function castAttribute($key, $value)
     {
-        if (is_null($value)) return $value;
+        if (is_null($value)) {
+            return $value;
+        }
 
-        switch ($this->getCastType($key))
-        {
+        switch ($this->getCastType($key)) {
             case 'int':
             case 'integer':
                 return (int) $value;
@@ -707,6 +709,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             case 'array':
             case 'json':
                 return $this->fromJson($value);
+            case 'collection':
+                return new BaseCollection($this->fromJson($value));
             default:
                 return $value;
         }
