@@ -1,7 +1,7 @@
 <?php
 
-class ModelTest extends PHPUnit_Framework_TestCase {
-
+class ModelTest extends PHPUnit_Framework_TestCase
+{
     public function testAttributeManipulation()
     {
         $model = new ModelStub;
@@ -225,5 +225,4 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $models = ModelStub::hydrate([['name' => 'John Doe']]);
         $this->assertEquals('John Doe', $models[0]->name);
     }
-
 }

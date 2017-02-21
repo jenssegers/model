@@ -2,8 +2,8 @@
 
 use Jenssegers\Model\Model;
 
-class ModelStub extends Model {
-
+class ModelStub extends Model
+{
     protected $hidden = ['password'];
 
     protected $casts = [
@@ -58,5 +58,4 @@ class ModelStub extends Model {
     {
         return 'test';
     }
-
 }
