@@ -30,6 +30,13 @@ Example
 -------
 
 ```php
+
+<?php
+    
+...
+
+use Jenssegers\Model\Model;
+
 class User extends Model {
 
     protected $hidden = ['password'];
