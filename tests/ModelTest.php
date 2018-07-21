@@ -178,7 +178,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_int($model->count));
         $this->assertEquals('bar', $model->default);
         $this->assertInstanceOf('\stdClass', $model->object_data);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $model->collection_data);
+        $this->assertInstanceOf('\Illuminate\Support\Collection', $model->collection_data);
 
         $attributes = $model->getAttributes();
         $this->assertTrue(is_string($attributes['score']));
@@ -196,7 +196,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_int($array['count']));
         $this->assertEquals('bar', $array['default']);
         $this->assertInstanceOf('\stdClass', $array['object_data']);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $array['collection_data']);
+        $this->assertInstanceOf('\Illuminate\Support\Collection', $array['collection_data']);
     }
 
     public function testGuarded()
@@ -234,7 +234,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testTotallyGuarded()
     {
-        $this->expectException('Jenssegers\Model\MassAssignmentException');
+        $this->setExpectedException('Jenssegers\Model\MassAssignmentException');
 
         $model = new ModelStub();
         $model->guard(['*']);
