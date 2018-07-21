@@ -652,8 +652,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function isJsonCastable($key)
     {
+        $castables = ['array', 'json', 'object', 'collection'];
         return $this->hasCast($key) &&
-               in_array($this->getCastType($key), ['array', 'json', 'object'], true);
+               in_array($this->getCastType($key), $castables, true);
     }
 
     /**

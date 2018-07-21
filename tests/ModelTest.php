@@ -170,7 +170,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $model->object_data = ['foo' => 'bar'];
         $model->active = 'true';
         $model->default = 'bar';
-        $model->collection_data = json_encode([['foo' => 'bar', 'baz' => 'bat']]);
+        $model->collection_data = [['foo' => 'bar', 'baz' => 'bat']];
 
         $this->assertTrue(is_float($model->score));
         $this->assertTrue(is_array($model->data));
