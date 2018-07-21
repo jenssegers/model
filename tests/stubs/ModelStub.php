@@ -12,6 +12,10 @@ class ModelStub extends Model
         'data'  => 'array',
         'active' => 'bool',
         'secret' => 'string',
+        'count' => 'int',
+        'object_data' => 'object',
+        'collection_data' => 'collection',
+        'foo' => 'bar',
     ];
 
     protected $guarded = [
@@ -25,6 +29,10 @@ class ModelStub extends Model
         'score',
         'data',
         'active',
+        'count',
+        'object_data',
+        'default',
+        'collection_data',
     ];
 
     public function getListItemsAttribute($value)

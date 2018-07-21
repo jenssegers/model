@@ -68,6 +68,13 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $array['name']);
         $this->assertFalse(isset($array['password']));
         $this->assertEquals($array, $model->jsonSerialize());
+
+        $model->addHidden(['name']);
+        $model->addVisible('password');
+        $array = $model->toArray();
+        $this->assertTrue(is_array($array));
+        $this->assertFalse(isset($array['name']));
+        $this->assertTrue(isset($array['password']));
     }
 
     public function testToJson()
@@ -159,21 +166,37 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $model = new ModelStub;
         $model->score = '0.34';
         $model->data = ['foo' => 'bar'];
+        $model->count = 1;
+        $model->object_data = ['foo' => 'bar'];
         $model->active = 'true';
+        $model->default = 'bar';
+        $model->collection_data = json_encode([['foo' => 'bar', 'baz' => 'bat']]);
 
         $this->assertTrue(is_float($model->score));
         $this->assertTrue(is_array($model->data));
         $this->assertTrue(is_bool($model->active));
+        $this->assertTrue(is_int($model->count));
+        $this->assertEquals('bar', $model->default);
+        $this->assertInstanceOf('\stdClass', $model->object_data);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $model->collection_data);
 
         $attributes = $model->getAttributes();
         $this->assertTrue(is_string($attributes['score']));
         $this->assertTrue(is_string($attributes['data']));
         $this->assertTrue(is_string($attributes['active']));
+        $this->assertTrue(is_int($attributes['count']));
+        $this->assertTrue(is_string($attributes['default']));
+        $this->assertTrue(is_string($attributes['object_data']));
+        $this->assertTrue(is_string($attributes['collection_data']));
 
         $array = $model->toArray();
         $this->assertTrue(is_float($array['score']));
         $this->assertTrue(is_array($array['data']));
         $this->assertTrue(is_bool($array['active']));
+        $this->assertTrue(is_int($array['count']));
+        $this->assertEquals('bar', $array['default']);
+        $this->assertInstanceOf('\stdClass', $array['object_data']);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $array['collection_data']);
     }
 
     public function testGuarded()
@@ -195,9 +218,23 @@ class ModelTest extends PHPUnit_Framework_TestCase
         ModelStub::reguard();
     }
 
+    public function testGuardedCallback()
+    {
+        ModelStub::unguard();
+        $mock = $this->getMockBuilder('stdClass')
+            ->setMethods(['callback'])
+            ->getMock();
+        $mock->expects($this->once())
+            ->method('callback')
+            ->will($this->returnValue('foo'));
+        $string = ModelStub::unguarded([$mock, 'callback']);
+        $this->assertEquals('foo', $string);
+        ModelStub::reguard();
+    }
+
     public function testTotallyGuarded()
     {
-        $this->setExpectedException('Jenssegers\Model\MassAssignmentException');
+        $this->expectException('Jenssegers\Model\MassAssignmentException');
 
         $model = new ModelStub();
         $model->guard(['*']);
