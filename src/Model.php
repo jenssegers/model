@@ -947,5 +947,4 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         return $this->toJson();
     }
-
 }
