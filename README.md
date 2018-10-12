@@ -38,6 +38,8 @@ class User extends Model {
 
     protected $casts = ['age' => 'integer'];
 
+    protected $dates = ['added_at'];
+
     public function save()
     {
         return API::post('/items', $this->attributes);
