@@ -499,7 +499,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         foreach ($dateAttributes as $attribute) {
             if (! array_key_exists($attribute, $attributes) ||
-                in_array($attribute, $mutatedAttributes)) {
+                in_array($attribute, $mutatedAttributes) ||
+                ! $attributes[$attribute]) {
                 continue;
             }
 
