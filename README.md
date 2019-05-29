@@ -31,10 +31,6 @@ Example
 
 ```php
 
-<?php
-    
-...
-
 use Jenssegers\Model\Model;
 
 class User extends Model {
