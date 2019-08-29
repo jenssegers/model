@@ -1,6 +1,8 @@
 <?php
 
-class ModelTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ModelTest extends TestCase
 {
     public function testAttributeManipulation()
     {
@@ -234,7 +236,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testTotallyGuarded()
     {
-        $this->setExpectedException('Jenssegers\Model\MassAssignmentException');
+        $this->expectException('Jenssegers\Model\MassAssignmentException');
 
         $model = new ModelStub();
         $model->guard(['*']);

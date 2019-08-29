@@ -2,3 +2,4 @@
 /vendor
 phpunit.phar
 composer.lock
+.phpunit.result.cache
