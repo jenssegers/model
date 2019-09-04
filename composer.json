@@ -15,7 +15,6 @@
         "illuminate/support": "4.0 - 6.0"
     },
     "require-dev": {
-        "laravel/laravel": "dev-develop@dev",
         "php-coveralls/php-coveralls": "*",
         "phpunit/phpunit": "8.*"
     },
