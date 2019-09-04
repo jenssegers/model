@@ -25,7 +25,5 @@
     },
     "autoload-dev": {
         "classmap": ["tests/stubs"]
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
