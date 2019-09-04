@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "illuminate/contracts": "4.0 - 6.0",
+        "illuminate/contracts": "5.0 - 6.0",
         "illuminate/support": "4.0 - 6.0"
     },
     "require-dev": {
