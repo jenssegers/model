@@ -8,15 +8,11 @@ jobs:
     strategy:
       matrix:
         php: [5.6, 7.0, 7.1, 7.2, 7.3]
+    container:
+      image: php:${{ matrix.php }}-cli
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
       run: php${{ matrix.php }} -v && composer -V
     - name: Docker version
       run: docker -v
-    - name: Install dependencies
-      run: composer install --prefer-source
-    - name: Run unit tests
-      run: php${{ matrix.php }} ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-    - name: Run coveralls
-      run: php${{ matrix.php }} vendor/bin/coveralls -v
