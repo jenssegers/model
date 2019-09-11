@@ -33,4 +33,4 @@ jobs:
     - name: Run unit tests
       run: ./vendor/bin/phpunit --coverage-clover clover.xml
     - name: Show Coverage
-      run: ./vendor/bin/coveralls -v
+      run: ./vendor/bin/php-coveralls -v
