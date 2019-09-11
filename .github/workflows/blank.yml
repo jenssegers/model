@@ -9,10 +9,12 @@ jobs:
       matrix:
         php: [5.6, 7.0, 7.1, 7.2, 7.3]
     container:
-      image: php:${{ matrix.php }}-cli
+      image: php:${{ matrix.php }}-alpine
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
       run: php -v
     - name: Install composer
-      run: composer -V
+      run: apk add wget && wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
+    - name: Install dependencies
+      run: composer install --prefer-source
