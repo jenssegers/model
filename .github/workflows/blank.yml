@@ -19,6 +19,8 @@ jobs:
     - name: Current directory
       run: pwd && ls -alt
     - name: Install dependencies
-      run: composer install --prefer-source -vvv
+      run: composer install --prefer-source
     - name: Run unit tests
       run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+    - name: Show Coverage
+      run: ./vendor/bin/coveralls -v
