@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [5.6, 7.0, 7.1, 7.2, 7.3]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Show php version
+      run: php -v && composer -V
+    - name: Install dependencies
+      run: composer install --no-interaction --prefer-source
+    - name: Run unit tests
+      run: php${{ matrix.php }} ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+    - name: Run coveralls
+      run: php${{ matrix.php }} vendor/bin/coveralls -v
