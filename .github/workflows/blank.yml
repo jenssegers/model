@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
-      run: php -v
+      run: sleep 1 && php -v
     - name: Install composer
       run: apk add wget && wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
     - name: Install dependencies
