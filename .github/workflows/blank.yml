@@ -33,5 +33,5 @@ jobs:
       run: pwd && ls -alt vendor/bin
     - name: Run unit tests
       run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-    - name: Show Coverage
+    - name: Run Coverage
       run: ./vendor/bin/php-coveralls -v
