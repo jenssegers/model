@@ -13,6 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
-      run: php${{ matrix.php }} -v && composer -V
-    - name: Docker version
-      run: docker -v
+      run: php -v
