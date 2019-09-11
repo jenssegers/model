@@ -22,7 +22,7 @@ jobs:
           pecl install xdebug-2.5.5; \
         else \
           pecl install xdebug-2.7.2;
-        endif \
+        fi; \
         docker-php-ext-enable xdebug; \
         wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
     - name: Current directory
