@@ -9,22 +9,22 @@ jobs:
       matrix:
         php: [5.6, 7.0, 7.1, 7.2, 7.3]
     container:
-      image: php:${{ matrix.php }}-cli
+      image: wodby/php:${{ matrix.php }}
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
       run: php -v
-    - name: Install composer
-      run: |
-        apt-get update; \
-        apt-get install -y wget git zip unzip; pecl install xdebug-2.7.2 ; \
-        docker-php-ext-enable; \
-        wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
+    # - name: Install composer
+    #   run: |
+    #     apt-get update; \
+    #     apt-get install -y wget git zip unzip; pecl install xdebug-2.7.2 ; \
+    #     docker-php-ext-enable; \
+    #     wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
     - name: Current directory
       run: pwd && ls -alt
     - name: Install dependencies
       run: composer install --prefer-source
     - name: Run unit tests
-      run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+      run: ./vendor/bin/phpunit --coverage-clover clover.xml
     - name: Show Coverage
       run: ./vendor/bin/coveralls -v
