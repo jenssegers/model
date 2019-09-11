@@ -12,8 +12,6 @@ jobs:
       image: php:${{ matrix.php }}-cli
     steps:
     - uses: actions/checkout@v1
-    - name: Show php version
-      run: php -v
     - name: Install composer
       run: |
         apt-get update; \
@@ -26,10 +24,12 @@ jobs:
         fi;
         docker-php-ext-enable xdebug; \
         wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
-    - name: Current directory
-      run: pwd && ls -alt
+    - name: Show php version
+      run: php -v
     - name: Install dependencies
       run: composer install --prefer-source
+    - name: Current directory
+      run: pwd && ls -alt vendor/bin
     - name: Run unit tests
       run: ./vendor/bin/phpunit --coverage-clover clover.xml
     - name: Show Coverage
