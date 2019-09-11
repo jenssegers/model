@@ -15,7 +15,7 @@ jobs:
     - name: Docker version
       run: docker -v
     - name: Install dependencies
-      run: composer install --no-interaction --prefer-source
+      run: composer install --prefer-source
     - name: Run unit tests
       run: php${{ matrix.php }} ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
     - name: Run coveralls
