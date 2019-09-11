@@ -15,7 +15,11 @@ jobs:
     - name: Show php version
       run: php -v
     - name: Install composer
-      run: apt-get update; apt-get install -y wget git zip unzip; wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
+      run: |
+        apt-get update; \
+        apt-get install -y wget git zip unzip; pecl install xdebug-2.7.2 ; \
+        docker-php-ext-enable; \
+        wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
     - name: Current directory
       run: pwd && ls -alt
     - name: Install dependencies
