@@ -20,3 +20,5 @@ jobs:
       run: pwd && ls -alt
     - name: Install dependencies
       run: composer install --prefer-source -vvv
+    - name: Run unit tests
+      run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
