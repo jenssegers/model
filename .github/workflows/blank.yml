@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
-      run: php -v && composer -V
+      run: php${{ matrix.php }} -v && composer -V
     - name: Install dependencies
       run: composer install --no-interaction --prefer-source
     - name: Run unit tests
