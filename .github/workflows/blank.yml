@@ -9,17 +9,22 @@ jobs:
       matrix:
         php: [5.6, 7.0, 7.1, 7.2, 7.3]
     container:
-      image: wodby/php:${{ matrix.php }}
+      image: php:${{ matrix.php }}-cli
     steps:
     - uses: actions/checkout@v1
     - name: Show php version
       run: php -v
-    # - name: Install composer
-    #   run: |
-    #     apt-get update; \
-    #     apt-get install -y wget git zip unzip; pecl install xdebug-2.7.2 ; \
-    #     docker-php-ext-enable; \
-    #     wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
+    - name: Install composer
+      run: |
+        apt-get update; \
+        apt-get install -y wget git zip unzip;
+        if [[ "${PHP_VERSION:0:3}" == "5.6" ]]; then \
+          pecl install xdebug-2.5.5; \
+        else \
+          pecl install xdebug-2.7.2;
+        endif \
+        docker-php-ext-enable xdebug; \
+        wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
     - name: Current directory
       run: pwd && ls -alt
     - name: Install dependencies
