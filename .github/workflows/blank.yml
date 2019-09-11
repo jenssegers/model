@@ -15,6 +15,6 @@ jobs:
     - name: Show php version
       run: php -v
     - name: Install composer
-      run: apt-get install wget && wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
+      run: apt-get update; apt-get install wget ; wget -qO- https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
     - name: Install dependencies
       run: composer install --prefer-source
