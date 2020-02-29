@@ -11,12 +11,12 @@
         }
     ],
     "require": {
-        "illuminate/contracts": "^5.0|^6.0",
-        "illuminate/support": "^4.0|^5.0|^6.0"
+        "illuminate/contracts": "^5.0|^6.0|^7.0",
+        "illuminate/support": "^4.0|^5.0|^6.0|^7.0"
     },
     "require-dev": {
         "php-coveralls/php-coveralls": "*",
-        "phpunit/phpunit": "^4.0|^5.0"
+        "phpunit/phpunit": "*"
     },
     "autoload": {
         "psr-4": {
