@@ -20,7 +20,7 @@ jobs:
     - name: Show php version
       run: php -v && composer -V
     - name: Debug if needed
-      run: if [[ "$DEBUG" == "true" ]]; then denv; fi
+      run: if [[ "$DEBUG" == "true" ]]; then env; fi
       env:
         DEBUG: ${{secrets.DEBUG}}
     - name: Get Composer Cache Directory
@@ -39,5 +39,8 @@ jobs:
     - name: Run Coverage
       run: ./vendor/bin/php-coveralls -v
       env:
-        COVERALLS_RUN_LOCALLY: ${{secrets.COVERALLS_RUN_LOCALLY}}
+        COVERALLS_RUN_LOCALLY: ${{ secrets.COVERALLS_RUN_LOCALLY }}
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
+    - name: show coverage json
+      run: cat build/logs/coveralls-upload.json
