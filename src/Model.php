@@ -724,7 +724,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function isClassCastable($key)
     {
         return array_key_exists($key, $this->casts) &&
-                class_exists($class = $this->casts[$key]) &&
+                class_exists($class = $this->parseCasterClass($this->casts[$key])) &&
                 ! in_array($class, static::$primitiveCastTypes);
     }
 
@@ -743,6 +743,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $segments = explode(':', $castType, 2);
 
         return new $segments[0](...explode(',', $segments[1]));
+    }
+
+    /**
+     * Parse the given caster class, removing any arguments.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function parseCasterClass($class)
+    {
+        return strpos($class, ':') === false
+                        ? $class
+                        : explode(':', $class, 2)[0];
     }
 
     /**
@@ -845,7 +858,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $caster = $this->resolveCasterClass($key);
 
             return $this->classCastCache[$key] = $caster instanceof CastsInboundAttributes
-                ? $this->attributes[$key]
+                ? ($this->attributes[$key] ?? null)
                 : $caster->get($this, $key, $this->attributes[$key] ?? null, $this->attributes);
         }
     }

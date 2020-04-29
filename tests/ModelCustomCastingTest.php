@@ -81,6 +81,19 @@ class ModelCustomCastingTest extends TestCase
         $this->assertEquals(hash('sha256', 'secret2'), $model->password);
     }
 
+    public function testCastClassResolution()
+    {
+        $model = new TestModelWithCustomCast;
+
+        $model->other_password = 'secret';
+
+        $this->assertEquals(hash('md5', 'secret'), $model->other_password);
+
+        $model->other_password = 'secret2';
+
+        $this->assertEquals(hash('md5', 'secret2'), $model->other_password);
+    }
+
     public function testSettingRawAttributesClearsTheCastCache()
     {
         $model = new TestModelWithCustomCast;
