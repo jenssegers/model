@@ -977,7 +977,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $this->attributes;
     }
 
-
     /**
      * Set the array of model attributes. No checking is done.
      *
