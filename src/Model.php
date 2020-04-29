@@ -552,10 +552,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $attributes[$key] = $this->castAttribute(
                 $key, $attributes[$key]
             );
-
-            if ($attributes[$key] instanceof Arrayable) {
-                $attributes[$key] = $attributes[$key]->toArray();
-            }
         }
 
         return $attributes;
