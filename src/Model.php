@@ -3,8 +3,6 @@
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection as BaseCollection;
 use JsonSerializable;
 
@@ -604,7 +602,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        return method_exists($this, 'get'.Util::stringStudly($key).'Attribute');
     }
 
     /**
@@ -616,7 +614,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        return $this->{'get'.Util::stringStudly($key).'Attribute'}($value);
     }
 
     /**
@@ -719,7 +717,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            $method = 'set'.Str::studly($key).'Attribute';
+            $method = 'set'.Util::stringStudly($key).'Attribute';
 
             return $this->{$method}($value);
         }
@@ -741,7 +739,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.Str::studly($key).'Attribute');
+        return method_exists($this, 'set'.Util::stringStudly($key).'Attribute');
     }
 
     /**
@@ -777,9 +775,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $except = $except ?: [];
 
-        $attributes = Arr::except($this->attributes, $except);
+        $attributes = array_diff_key($this->attributes, array_flip($except));
 
-        return with($instance = new static)->fill($attributes);
+        return (new static)->fill($attributes);
     }
 
     /**
@@ -824,7 +822,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches)) {
             foreach ($matches[1] as $match) {
                 if (static::$snakeAttributes) {
-                    $match = Str::snake($match);
+                    $match = Util::stringSnake($match);
                 }
 
                 $mutatedAttributes[] = lcfirst($match);
