@@ -15,7 +15,14 @@ class ModelStub extends Model
         'count' => 'int',
         'object_data' => 'object',
         'collection_data' => 'collection',
+        'created_at' => 'date',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'timestamp',
         'foo' => 'bar',
+    ];
+
+    protected $dates = [
+        'added_at',
     ];
 
     protected $guarded = [
@@ -33,6 +40,10 @@ class ModelStub extends Model
         'object_data',
         'default',
         'collection_data',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'added_at',
     ];
 
     public function getListItemsAttribute($value)

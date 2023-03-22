@@ -173,6 +173,10 @@ class ModelTest extends TestCase
         $model->active = 'true';
         $model->default = 'bar';
         $model->collection_data = [['foo' => 'bar', 'baz' => 'bat']];
+        $model->created_at = '2018-10-12 03:45:22';
+        $model->updated_at = '2018-10-12 03:45:22';
+        $model->deleted_at = '2018-10-12 03:45:22';
+        $model->added_at = '2018-10-12 03:45:22';
 
         $this->assertTrue(is_float($model->score));
         $this->assertTrue(is_array($model->data));
@@ -181,6 +185,10 @@ class ModelTest extends TestCase
         $this->assertEquals('bar', $model->default);
         $this->assertInstanceOf('\stdClass', $model->object_data);
         $this->assertInstanceOf('\Illuminate\Support\Collection', $model->collection_data);
+        $this->assertInstanceOf('\Illuminate\Support\Carbon', $model->created_at);
+        $this->assertInstanceOf('\Illuminate\Support\Carbon', $model->updated_at);
+        $this->assertTrue(is_int($model->deleted_at));
+        $this->assertInstanceOf('\Illuminate\Support\Carbon', $model->added_at);
 
         $attributes = $model->getAttributes();
         $this->assertTrue(is_string($attributes['score']));
@@ -190,6 +198,10 @@ class ModelTest extends TestCase
         $this->assertTrue(is_string($attributes['default']));
         $this->assertTrue(is_string($attributes['object_data']));
         $this->assertTrue(is_string($attributes['collection_data']));
+        $this->assertTrue(is_string($attributes['created_at']));
+        $this->assertTrue(is_string($attributes['updated_at']));
+        $this->assertTrue(is_string($attributes['deleted_at']));
+        $this->assertTrue(is_string($attributes['added_at']));
 
         $array = $model->toArray();
         $this->assertTrue(is_float($array['score']));
@@ -199,6 +211,10 @@ class ModelTest extends TestCase
         $this->assertEquals('bar', $array['default']);
         $this->assertInstanceOf('\stdClass', $array['object_data']);
         $this->assertInstanceOf('\Illuminate\Support\Collection', $array['collection_data']);
+        $this->assertInstanceOf('\Illuminate\Support\Carbon', $array['created_at']);
+        $this->assertInstanceOf('\Illuminate\Support\Carbon', $array['updated_at']);
+        $this->assertTrue(is_int($model->deleted_at));
+        $this->assertInstanceOf('\Illuminate\Support\Carbon', $array['added_at']);
     }
 
     public function testGuarded()
