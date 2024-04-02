@@ -1,8 +1,8 @@
 {
-    "name": "jenssegers/model",
+    "name": "joshcadman01/jenssegers-model",
     "description": "An Laravel eloquent-like model class, for Laravel and other frameworks",
     "keywords": ["laravel", "eloquent", "model"],
-    "homepage": "https://github.com/jenssegers/model",
+    "homepage": "https://github.com/joshcadman01/jessengers-model",
     "license" : "MIT",
     "authors": [
         {
