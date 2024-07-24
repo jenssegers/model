@@ -872,7 +872,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the value for a given offset.
      *
      * @param  mixed  $offset
-     * @return mix
+     * @return mixed
     public function offsetGet(mixed $offset): mixed
     {
         return $this->$offset;
