@@ -410,7 +410,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $key
      * @return bool
      */
-    public function isGuarded($key)
+    public function isGuarded($key): bool
     {
         return in_array($key, $this->guarded) || $this->guarded == ['*'];
     }
@@ -420,7 +420,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return bool
      */
-    public function totallyGuarded()
+    public function totallyGuarded(): bool
     {
         return count($this->fillable) == 0 && $this->guarded == ['*'];
     }
@@ -431,7 +431,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  int  $options
      * @return string
      */
-    public function toJson($options = 0)
+    public function toJson($options = 0): string
     {
         return json_encode($this->jsonSerialize(), $options);
     }
@@ -654,7 +654,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $castables = ['array', 'json', 'object', 'collection'];
         return $this->hasCast($key) &&
-               in_array($this->getCastType($key), $castables, true);
+            in_array($this->getCastType($key), $castables, true);
     }
 
     /**
@@ -872,8 +872,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Get the value for a given offset.
      *
      * @param  mixed  $offset
-     * @return mixed
-     */
+     * @return mix
     public function offsetGet(mixed $offset): mixed
     {
         return $this->$offset;
@@ -911,7 +910,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __isset($key)
     {
         return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-                ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key)));
+            ($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key)));
     }
 
     /**
