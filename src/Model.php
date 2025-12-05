@@ -773,7 +773,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array|null  $except
      * @return \Jenssegers\Model\Model
      */
-    public function replicate(array $except = null)
+    public function replicate(?array $except = null)
     {
         $except = $except ?: [];
 
