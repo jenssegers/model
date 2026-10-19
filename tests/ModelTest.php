@@ -223,14 +223,17 @@ class ModelTest extends TestCase
     public function testGuardedCallback()
     {
         ModelStub::unguard();
-        $mock = $this->getMockBuilder('stdClass')
-            ->addMethods(['callback'])
-            ->getMock();
-        $mock->expects($this->once())
-            ->method('callback')
-            ->willReturn('foo');
-        $string = ModelStub::unguarded([$mock, 'callback']);
+        $callbackTarget = new class {
+            public int $callCount = 0;
+            public function callback(): string
+            {
+                $this->callCount++;
+                return 'foo';
+            }
+        };
+        $string = ModelStub::unguarded([$callbackTarget, 'callback']);
         $this->assertEquals('foo', $string);
+        $this->assertSame(1, $callbackTarget->callCount);
         ModelStub::reguard();
     }
 
